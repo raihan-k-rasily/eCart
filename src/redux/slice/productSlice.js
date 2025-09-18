@@ -13,25 +13,32 @@ const productSlice =  createSlice({
     name:'products',
     initialState:{
         allProducts:[],
+        dummyAllProducts:[],
         loading:true,
         error:''
     },
     reducers:{
         // synchronus action function
+        searchProducts:(state,action)=>{
+          state.allProducts = state.dummyAllProducts?.filter(product=>product?.title.toLowerCase().includes(action.payload.toLowerCase()))
+        }
     },
     extraReducers:(builder)=>{
           builder.addCase(fetchAllProducts.pending,(state,action)=>{
             state.allProducts = []
+            state.dummyAllProducts= []
             state.loading = true
             state.error = ""
           }),
           builder.addCase(fetchAllProducts.fulfilled,(state,action)=>{
             state.allProducts = action.payload
+            state.dummyAllProducts = action.payload
             state.loading = false
             state.error = ""
           }),
           builder.addCase(fetchAllProducts.rejected,(state,action)=>{
             state.allProducts = []
+            state.dummyAllProducts = []
             state.loading = false
             state.error = "Api Call Failed"
           })
@@ -39,4 +46,5 @@ const productSlice =  createSlice({
     }
 })
 
+export const {searchProducts} = productSlice.actions
 export default productSlice.reducer

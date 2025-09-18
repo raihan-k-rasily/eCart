@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect , useState } from 'react'
 import Header from '../components/Header'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -13,10 +13,33 @@ function Home() {
   useEffect(()=>{
     dispatch(fetchAllProducts())
   },[])
+
+  
+  const productsPerPage = 8
+  const totalPages = Math.ceil(allProducts?.length/productsPerPage)
+  const [currPage,setCurrPage] = useState(1)
+  const currProductLastIndex = currPage * productsPerPage
+  const currProductFirstIndex = currProductLastIndex - productsPerPage
+  const visibleProductsCard = allProducts?.slice(currProductFirstIndex,currProductLastIndex)
+
+  const navigateBackward = ()=>{
+    if(currPage!=1){
+      setCurrPage(currPage-1)
+    }else{
+      setCurrPage(totalPages)
+    }
+  }
+  const navigateForward = ()=>{
+    if(currPage!=totalPages){
+      setCurrPage(currPage+1)
+    }else{
+      setCurrPage(1)
+    }
+  }
   return (
       
     <>
-     <Header />
+     <Header insideHeader={true}/>
      <div className='pt-17 pb-5 mx-5 '>
       <div className="grid grid-cols-4 gap-4">
        
@@ -25,8 +48,8 @@ function Home() {
 
          <p>loading</p>
         :
-         allProducts?.length>0?
-         allProducts?.map((product)=>(
+         visibleProductsCard?.length>0?
+         visibleProductsCard?.map((product)=>(
            <div key={product.id} className="rounded p-2 shadow">
           {/* image */}
           <img  height={'200px'} src={product.thumbnail}/>
@@ -45,6 +68,12 @@ function Home() {
           }
       </div>
     
+     </div>
+     {/* pagination */}
+     <div className="text-center my-10 font-bold text-2xl text-violet-600">
+      <button className='cursor-pointer'><i onClick={navigateBackward} className="fa-solid fa-backward"></i></button>
+      <span> { currPage } of { totalPages }</span>
+      <button className='cursor-pointer'><i onClick={navigateForward} className="fa-solid fa-forward"></i></button>
      </div>
     </>
   )
